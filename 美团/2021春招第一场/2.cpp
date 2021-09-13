@@ -17,9 +17,7 @@ int main(){
         sum+=ans[i]*i;
     }
     a=sum/cos;
-    //cout<<sum<<cos<<a;
     
     cout<<fun(a);
-    //printf("%.1lf",a);
     return 0;
 }
