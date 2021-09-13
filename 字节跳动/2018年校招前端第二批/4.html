@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<style>
+    .container {
+        width: 100%;
+        height: 600px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    .display {
+        height: 600px;
+        width: 600px;
+        text-align: center;
+        background-color: #F5F5F5
+    }
+    .font {
+        margin-top: 100px;
+        color: transparent;
+        background-color: black;
+        font-size: 80px;
+        text-shadow: rgba(255, 255, 255, 0.5) 0 5px 6px, rgba(255, 255, 255, 0.2) 1px 3px 3px;
+    }
+    .close {
+        float: right;
+        color: #EBDEDE;
+        font-size: 14px;
+        cursor: pointer;
+    }
+    #input {
+        width: 400px;
+        height: 35px;
+        border: 1px solid #ddd;
+        margin: 0 auto;
+    }
+    #want_insert {
+        text-align: left;
+        padding: 15px;
+        font-size: 12px
+    }
+    #show {
+        display: none;
+        width: 400px;
+        border: 1px solid #ddd;
+        margin: 0 auto;
+        background-color: white
+    }
+</style>
+<body>
+<div class="container">
+    <div class="display">
+        <div class="font">todos</div>
+        <input id="input" type="text"></input>
+        <div id="show">
+            <div id="want_insert">
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+<script> 
+    //所有下拉项
+    const arr = [];
+    //经筛选过的下拉项
+    var current = [];
+    var input = document.getElementById("input");
+    var show = document.getElementById("show");
+    //根据输入元素过滤
+    function get_list(input) {
+        if (input == "") return [];
+        var temp = [];
+        for (var i = 0; i < arr.length; i++) {
+            if (arr[i].toString().indexOf(input) > -1) {
+                temp.push(arr[i]);
+            }
+        }
+        return temp;
+    }
+    //注意是onkeyup不是onkeydown
+    //如果onkeydown监听的是之前的输入值
+    document.onkeyup = function (e) {
+        //对整个页面文档监听
+        var keyNum = window.event ? e.keyCode : e.which;
+        if ((keyNum >= 48 && keyNum <= 57) || (keyNum >= 65 && keyNum <= 90) || keyNum == 13 || keyNum == 8) {
+            refresh(keyNum)
+        }
+    }
+    //获取新的下拉选项
+    function refresh(keyNum) {
+        //按回车时将新的值加入数组
+        //避免重复     
+        if (arr.indexOf(input.value) == -1 && keyNum == 13) {
+            arr.push(input.value);
+        }
+        current = [];
+        //根据输入框的值进行过滤
+        current = get_list(input.value); 
+        //如果数组非空，就显示下拉框
+        if (current.length > 0) {
+            show.style.display = "block";
+        }
+        var want_insert = document.getElementById("want_insert");
+        want_insert.innerHTML = "";
+        for (var i = 0; i < current.length; i++) {
+            var div = document.createElement('div');
+            div.style.marginBottom = "5px";
+            var span = document.createElement('span');
+            span.innerHTML = current[i];
+            var button = document.createElement('div');
+            button.className = 'close';
+            button.innerHTML = "x";
+            div.appendChild(span);
+            div.appendChild(button);
+            want_insert.appendChild(div);
+        }
+        var close = document.getElementsByClassName("close");
+        for (let i = 0; i < close.length; i++) {
+            close[i].onclick = function () {
+                //删除某个下拉项
+                this.parentNode.parentNode.removeChild(this.parentNode);
+                //删除数组元素：先设为null再删除
+                arr[arr.indexOf(this.parentNode.firstChild.innerText)] = null;
+                arr.splice(arr.indexOf(null), 1);
+ 
+                current[arr.indexOf(this.parentNode.firstChild.innerText)] = null;
+                current.splice(arr.indexOf(null), 1);
+                //数组空了就不显示下拉框了
+                if (current.length == 0 || arr.length == 0) {
+                    show.style.display = "none";
+                }
+            }
+        }
+        //下拉框清空
+        if (current.length == 0 || arr.length == 0) {
+            show.style.display = "none";
+        }
+        //按回车时清空输入框
+        if (keyNum == 13) {
+            input.value = "";
+        }
+    }
+ 
+</script>
